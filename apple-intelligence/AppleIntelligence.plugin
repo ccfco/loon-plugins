@@ -1,5 +1,5 @@
 #!name=Apple Intelligence 分流
-#!desc=将 Apple Intelligence / Private Cloud Compute / Siri 相关域名分流到代理，解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」的问题。\n域名清单源自 Apple 官方文档 support.apple.com/en-us/101555。\n\n⚠️ 本插件为纯分流规则（无脚本 / 无 MITM），因此插件详情页除本说明外没有可配置项，属正常现象 —— 规则是否生效请看 Loon「规则」计数或抓包记录，而非本页。\n\n安装后请在插件「策略」处选择你的代理节点组（对应下方规则中的 PROXY）。
+#!desc=解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」：把以下 Apple 官方 AI / Siri 域名分流到你的节点。\n\n【分流域名】\n• apple-relay.apple.com — 苹果智能扩展\n• apple-relay.cloudflare.com — 私有云计算(PCC)\n• apple-relay.fastly-edge.com — 私有云计算(PCC)\n• cp4.cloudflare.com — 私有云计算(PCC)\n• guzzoni.apple.com — Siri / 听写\n• *.smoot.apple.com — 搜索(Siri/Spotlight/Lookup/Safari/News)\n来源：Apple 官方文档 support.apple.com/en-us/101555\n\n【用法】在本插件「策略」处选择你的代理节点组（即规则中的 PROXY）。\n\n【说明】纯分流规则，无脚本 / 无 MITM，故「设置」区无可配置项属正常；规则不会在详情页逐条列出，是否生效请看 Loon 抓包记录或首页「规则」计数（应 +6）。
 #!author=ccfco[https://github.com/ccfco]
 #!homepage=https://github.com/ccfco/loon-plugins
 #!icon=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png
