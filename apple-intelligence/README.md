@@ -29,13 +29,17 @@
 
 ## 安装
 
-在 Loon 中 **插件 → 添加插件**，粘贴：
+在 Loon 中 **插件 → 右上角 ➕ → 添加插件**，粘贴：
 
 ```
 https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/AppleIntelligence.plugin
 ```
 
-安装时会弹出一个参数 **Policy**：填你 Loon 里**已存在的代理策略组名**（默认 `Proxy`）。比如你的节点组叫 `🚀 节点选择`，就填这个名字，否则规则会因为找不到组而失效。
+安装后，**点进这个插件，把「策略」（policy）选成你自己的代理节点组**。
+
+> 插件里的规则策略统一写成 `PROXY`——这是 Loon 的官方机制，`PROXY` 代表「你在配置该插件时手动选择的策略组」。如果你不选，Loon 会按「找不到策略组」处理（回落到全局策略里的第一个节点）。所以**务必手动选一次**自己的节点组。
+>
+> 参考：[Loon 官方插件文档 · 插件中规则的策略](https://nsloon.app/docs/Plugin/)。
 
 ## 验证是否生效
 
@@ -54,7 +58,7 @@ https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/App
   ```
   > 注意这会禁掉**所有** QUIC（可能影响 YouTube 等的 HTTP3 加速），按需开启。
 
-**填了 Policy 还是没分流？** 检查填入的组名和 Loon 配置里的组名**完全一致**（含 emoji、空格、大小写）。
+**选了策略还是没分流 / 点进去空白？** 确认插件详情里「策略」已手动选成你的节点组；若整个插件内容显示空白，多半是规则策略字段非法（Loon 插件规则只接受 `DIRECT` / `REJECT`类 / `PROXY` 三种），本插件统一用 `PROXY`，正常应能解析。
 
 ## 维护说明
 
