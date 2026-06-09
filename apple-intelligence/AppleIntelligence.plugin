@@ -1,8 +1,12 @@
 #!name=Apple Intelligence 分流
-#!desc=将 Apple Intelligence / Private Cloud Compute / Siri 相关域名分流到代理，解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」的问题。域名清单源自 Apple 官方文档 support.apple.com/en-us/101555。安装后请在插件的「策略」处选择你的代理节点组（PROXY）。
+#!desc=将 Apple Intelligence / Private Cloud Compute / Siri 相关域名分流到代理，解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」的问题。\n域名清单源自 Apple 官方文档 support.apple.com/en-us/101555。\n\n⚠️ 本插件为纯分流规则（无脚本 / 无 MITM），因此插件详情页除本说明外没有可配置项，属正常现象 —— 规则是否生效请看 Loon「规则」计数或抓包记录，而非本页。\n\n安装后请在插件「策略」处选择你的代理节点组（对应下方规则中的 PROXY）。
 #!author=ccfco[https://github.com/ccfco]
 #!homepage=https://github.com/ccfco/loon-plugins
 #!icon=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png
+#!tag=Apple, Apple Intelligence, 分流
+#!system=iOS,iPadOS,macOS,visionOS
+#!system_version=18.0
+#!date=2026-06-09
 
 [Rule]
 # ===== Apple Intelligence / Private Cloud Compute =====
