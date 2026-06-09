@@ -1,5 +1,5 @@
 #!name=Apple Intelligence 分流
-#!desc=解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」：把以下 Apple 官方 AI / Siri 域名分流到你的节点。\n\n【分流域名】\n• apple-relay.apple.com — 苹果智能扩展\n• apple-relay.cloudflare.com — 私有云计算(PCC)\n• apple-relay.fastly-edge.com — 私有云计算(PCC)\n• cp4.cloudflare.com — 私有云计算(PCC)\n• guzzoni.apple.com — Siri / 听写\n• *.smoot.apple.com — 搜索(Siri/Spotlight/Lookup/Safari/News)\n来源：Apple 官方文档 support.apple.com/en-us/101555\n\n【用法】安装后 Loon 会弹「PROXY 未指定」提醒，点一下该通知（或进入本插件「策略」处），把策略选成你的代理节点组即可。只需一次，选完永久不再提醒；这是所有走代理插件的统一交互，作者无法替你预填。\n\n【可选开关】本插件「设置」里有一个「禁用 QUIC」开关，默认关闭。若你的节点不转发 UDP、苹果智能仍报网络错误，可打开它强制把请求回落到 TCP 走代理（注意：这会影响所有走 HTTP/3 的服务，如 YouTube 加速）。\n\n【说明】纯分流规则，无脚本 / 无 MITM；规则不会在详情页逐条列出，是否生效请看 Loon 抓包记录或首页「规则」计数。
+#!desc=解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」：把以下 Apple 官方 AI / Siri 域名分流到你的节点。\n\n【分流域名】\n• apple-relay.apple.com — 苹果智能扩展\n• apple-relay.cloudflare.com — 私有云计算(PCC)\n• apple-relay.fastly-edge.com — 私有云计算(PCC)\n• cp4.cloudflare.com — 私有云计算(PCC)\n• guzzoni.apple.com — Siri / 听写\n• *.smoot.apple.com — 搜索(Siri/Spotlight/Lookup/Safari/News)\n来源：Apple 官方文档 support.apple.com/en-us/101555\n\n【用法】安装后 Loon 会弹「PROXY 未指定」提醒，点一下该通知（或进入本插件「策略」处），把策略选成你的代理节点组即可。只需一次，选完永久不再提醒；这是所有走代理插件的统一交互，作者无法替你预填。\n\n【说明】纯分流规则，无脚本 / 无 MITM，故「设置」区无可配置项属正常；规则不会在详情页逐条列出，是否生效请看 Loon 抓包记录或首页「规则」计数（应 +6）。
 #!author=ccfco[https://github.com/ccfco]
 #!homepage=https://github.com/ccfco/loon-plugins
 #!icon=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png
@@ -7,9 +7,6 @@
 #!system=iOS,iPadOS,macOS,visionOS
 #!system_version=18.0
 #!date=2026-06-09
-
-[Argument]
-DisableQUIC = switch,false,tag=禁用 QUIC（UDP 443）,desc=默认关闭。苹果智能的 PCC 域名同时支持 QUIC(UDP 443)，若你的节点不转发 UDP，QUIC 请求会绕过分流、仍报「网络错误」。打开后会全局拒绝 QUIC、强制回落 TCP 走代理——注意这会影响所有走 HTTP/3 的服务（如 YouTube 加速）。建议先换支持 UDP 的节点，仍不行再开此项。
 
 [Rule]
 # ===== Apple Intelligence / Private Cloud Compute =====
@@ -27,6 +24,3 @@ DOMAIN,cp4.cloudflare.com,PROXY
 DOMAIN,guzzoni.apple.com,PROXY
 # 搜索服务（Siri / Spotlight / Lookup / Safari / News / Messages / Music）
 DOMAIN-SUFFIX,smoot.apple.com,PROXY
-
-# ===== 可选：禁用 QUIC，强制回落 TCP（默认关闭，由「设置」里的 DisableQUIC 开关控制）=====
-AND,((PROTOCOL,UDP),(DEST-PORT,443)),REJECT,enabled={DisableQUIC}
