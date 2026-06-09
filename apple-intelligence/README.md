@@ -35,9 +35,9 @@
 https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/AppleIntelligence.plugin
 ```
 
-安装后，**点进这个插件，把「策略」（policy）选成你自己的代理节点组**。
+安装后，**点进这个插件、或点一下 Loon 弹出的「PROXY 未指定」通知，把「策略」选成你自己的代理节点组**。这一步只需做一次。
 
-> 插件里的规则策略统一写成 `PROXY`——这是 Loon 的官方机制，`PROXY` 代表「你在配置该插件时手动选择的策略组」。如果你不选，Loon 会按「找不到策略组」处理（回落到全局策略里的第一个节点）。所以**务必手动选一次**自己的节点组。
+> 插件里的规则策略统一写成 `PROXY`——这是 Loon 的官方机制，`PROXY` 代表「你在配置该插件时手动选择的策略组」。这是所有「走代理」的 Loon 插件的统一交互：作者无法替你预填，因为每台设备的节点组名字都不同。
 >
 > 参考：[Loon 官方插件文档 · 插件中规则的策略](https://nsloon.app/docs/Plugin/)。
 
@@ -47,18 +47,22 @@ https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/App
 
 > ⚠️ 插件中的 PROXY 未指定 ——『Apple Intelligence 分流』插件中的 PROXY 项未指派代理策略，请点击该通知进行指派
 
-这不是 bug，而是因为插件规则里的 `PROXY` 占位符**还没被绑定到任何节点组**。Loon 插件规则只接受 `DIRECT` / `REJECT` / `PROXY` 三种策略，其中 `PROXY` 必须由你指定一次。Loon 没有「全局默认代理组」可供插件直接套用，所以**无法做到完全不指定就自动走代理**——但只要绑定一次，提醒就会永久消失。两种绑法：
+**这不是故障，也不是这个插件特有的问题。** 原因是插件规则里的 `PROXY` 占位符还处于「未指派」状态。Loon 的判定只有两档：**未指派 → 每次重载/联网都提醒；已指派 → 永久不再提醒**，中间没有「弹一次就停」。所以只要你一直没指派，它就一直弹（虽然此时它会偷偷回落到全局策略里的第一个节点，分流照常生效，但占位符仍算未指派）。
 
-1. **最省事**：直接点那条通知，选你自己的节点组即可。
-2. **一劳永逸（推荐）**：在 Loon 配置文件的 `[Plugin]` 段，给这条插件的导入行加上 `policy=` 默认策略参数：
+**正解（一步，最通用）：直接点那条通知 → 选你自己的节点组。** 选完即「已指派」，通知永久消失，不用编辑配置、不用碰任何文件。这就是 Loon 官方设计的标准做法。
 
-   ```
-   https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/AppleIntelligence.plugin, policy=你的节点组名, tag=Apple Intelligence 分流, enabled=true
-   ```
+<details>
+<summary>进阶可选：在配置里预设默认策略（管文本配置的人才需要）</summary>
 
-   把 `你的节点组名` 换成你 Loon 里真实存在的策略组名称。写进配置后，插件每次更新/重载都会带着默认策略，不会再提示。
+如果你习惯直接编辑 `.conf`，也可以在 `[Plugin]` 段给这条插件的导入行末尾加 `policy=` 参数，效果等同于提前指派好：
 
-> 如果你之前点通知绑过、却还是反复弹，多半是配置行里没有持久化 `policy=`，插件一更新就被重置——用上面第 2 种方法写进配置最稳。
+```
+https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/AppleIntelligence.plugin, policy=你的节点组名, tag=Apple Intelligence 分流, enabled=true
+```
+
+把 `你的节点组名` 换成你 Loon「策略」页里真实存在的组名。对普通用户来说，这比直接点通知更麻烦，按需使用即可。
+
+</details>
 
 ## 关于「插件详情页空白」（重要）
 
