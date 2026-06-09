@@ -4,7 +4,6 @@
 #!homepage=https://github.com/ccfco/loon-plugins
 #!icon=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png
 #!tag=Apple, Apple Intelligence, 分流
-#!system=iOS,iPadOS,macOS
 #!date=2026-06-09
 
 [Argument]
