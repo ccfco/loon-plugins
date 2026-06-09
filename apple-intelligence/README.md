@@ -74,6 +74,13 @@ https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleInte
 
 </details>
 
+## 临时开关整个插件
+
+想一键停用/启用整个插件（这 6 条规则全部生效或全部停），**不用改插件**，Loon 自带总开关：
+
+- **「插件」列表里**：进入 Loon「插件」页，找到本插件，那一行就有**启用开关**，关掉 = 整个插件停用。
+- **配置文件里**：`[Plugin]` 导入行末尾加 `enabled=false`（停用）/ `enabled=true`（启用）。
+
 ## 关于「插件详情页空白 / 内容很少」（重要）
 
 先分清两种「空白」：
