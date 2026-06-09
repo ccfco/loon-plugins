@@ -1,0 +1,25 @@
+#!name=Apple Intelligence 分流
+#!desc=将 Apple Intelligence / Private Cloud Compute / Siri 相关域名分流到指定代理，解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」的问题。域名清单源自 Apple 官方文档 support.apple.com/en-us/101555。
+#!author=ccfco[https://github.com/ccfco]
+#!homepage=https://github.com/ccfco/loon-plugins
+#!icon=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png
+
+#!arguments=Policy:Proxy
+#!arguments-desc=Policy: 分流使用的节点 / 策略组名称。填入你 Loon 配置里已存在的代理组名（默认 Proxy）。
+
+[Rule]
+# ===== Apple Intelligence / Private Cloud Compute =====
+# Apple Intelligence Extensions
+DOMAIN,apple-relay.apple.com,{{{Policy}}}
+# Private Cloud Compute（OHTTP 中继）
+DOMAIN,apple-relay.cloudflare.com,{{{Policy}}}
+# Private Cloud Compute（OHTTP 中继）
+DOMAIN,apple-relay.fastly-edge.com,{{{Policy}}}
+# Private Cloud Compute
+DOMAIN,cp4.cloudflare.com,{{{Policy}}}
+
+# ===== Siri / 听写 / 搜索 =====
+# Siri 与听写请求
+DOMAIN,guzzoni.apple.com,{{{Policy}}}
+# 搜索服务（Siri / Spotlight / Lookup / Safari / News / Messages / Music）
+DOMAIN-SUFFIX,smoot.apple.com,{{{Policy}}}
