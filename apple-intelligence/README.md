@@ -41,6 +41,25 @@ https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/App
 >
 > 参考：[Loon 官方插件文档 · 插件中规则的策略](https://nsloon.app/docs/Plugin/)。
 
+## 一直收到「插件中的 PROXY 未指定」通知怎么办
+
+如果 Loon 反复弹这条提醒：
+
+> ⚠️ 插件中的 PROXY 未指定 ——『Apple Intelligence 分流』插件中的 PROXY 项未指派代理策略，请点击该通知进行指派
+
+这不是 bug，而是因为插件规则里的 `PROXY` 占位符**还没被绑定到任何节点组**。Loon 插件规则只接受 `DIRECT` / `REJECT` / `PROXY` 三种策略，其中 `PROXY` 必须由你指定一次。Loon 没有「全局默认代理组」可供插件直接套用，所以**无法做到完全不指定就自动走代理**——但只要绑定一次，提醒就会永久消失。两种绑法：
+
+1. **最省事**：直接点那条通知，选你自己的节点组即可。
+2. **一劳永逸（推荐）**：在 Loon 配置文件的 `[Plugin]` 段，给这条插件的导入行加上 `policy=` 默认策略参数：
+
+   ```
+   https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/AppleIntelligence.plugin, policy=你的节点组名, tag=Apple Intelligence 分流, enabled=true
+   ```
+
+   把 `你的节点组名` 换成你 Loon 里真实存在的策略组名称。写进配置后，插件每次更新/重载都会带着默认策略，不会再提示。
+
+> 如果你之前点通知绑过、却还是反复弹，多半是配置行里没有持久化 `policy=`，插件一更新就被重置——用上面第 2 种方法写进配置最稳。
+
 ## 关于「插件详情页空白」（重要）
 
 **这是纯分流规则插件的正常现象，不是故障。**
