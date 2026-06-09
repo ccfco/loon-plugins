@@ -1,0 +1,7 @@
+#!name=AI分流-精简测试
+#!desc=iPad 空白排查临时用：极简版，仅基础信息 + 3 条规则，无长描述、无 #!system、无 [Argument]。验证完即可删除。
+
+[Rule]
+DOMAIN,apple-relay.apple.com,PROXY
+DOMAIN,guzzoni.apple.com,PROXY
+DOMAIN-SUFFIX,smoot.apple.com,PROXY
