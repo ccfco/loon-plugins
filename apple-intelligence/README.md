@@ -61,25 +61,13 @@ https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/App
 
 **正解（一步，最通用）：直接点那条通知 → 选你自己的节点组。** 选完即「已指派」，通知永久消失，不用编辑配置、不用碰任何文件。这就是 Loon 官方设计的标准做法。
 
-<details>
-<summary>进阶可选：在配置里预设默认策略（管文本配置的人才需要）</summary>
-
-如果你习惯直接编辑 `.conf`，也可以在 `[Plugin]` 段给这条插件的导入行末尾加 `policy=` 参数，效果等同于提前指派好：
+**进阶可选（只有习惯编辑 `.conf` 的人才需要）：** 也可以在 `[Plugin]` 段给这条插件的导入行末尾加 `policy=` 参数，效果等同于提前指派好策略：
 
 ```
 https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleIntelligence.plugin, policy=你的节点组名, tag=Apple Intelligence 分流, enabled=true
 ```
 
 把 `你的节点组名` 换成你 Loon「策略」页里真实存在的组名。对普通用户来说，这比直接点通知更麻烦，按需使用即可。
-
-</details>
-
-## 临时开关整个插件
-
-想一键停用/启用整个插件（这 6 条规则全部生效或全部停），**不用改插件**，Loon 自带总开关：
-
-- **「插件」列表里**：进入 Loon「插件」页，找到本插件，那一行就有**启用开关**，关掉 = 整个插件停用。
-- **配置文件里**：`[Plugin]` 导入行末尾加 `enabled=false`（停用）/ `enabled=true`（启用）。
 
 ## 关于「插件详情页空白 / 内容很少」（重要）
 
