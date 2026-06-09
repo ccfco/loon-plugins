@@ -29,11 +29,21 @@
 
 ## 安装
 
-在 Loon 中 **插件 → 右上角 ➕ → 添加插件**，粘贴：
+在 Loon 中 **插件 → 右上角 ➕ → 添加插件**，粘贴下面链接。
+
+**推荐（国内可直连，走 jsDelivr CDN）：**
+
+```
+https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleIntelligence.plugin
+```
+
+**备用（GitHub 源站，国内大陆常被墙，可能装上后详情页空白）：**
 
 ```
 https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/AppleIntelligence.plugin
 ```
+
+> ⚠️ **国内大陆务必用第一个 jsDelivr 链接。** `raw.githubusercontent.com` 在大陆网络下经常连不上，会导致 Loon「存了链接但下不到内容」→ 插件详情页一片空白（看起来像故障，其实是没下载下来）。换成 jsDelivr 镜像即可。jsDelivr 有 CDN 缓存，作者更新后偶尔要等一会儿才刷新。
 
 安装后，**点进这个插件、或点一下 Loon 弹出的「PROXY 未指定」通知，把「策略」选成你自己的代理节点组**。这一步只需做一次。
 
@@ -57,20 +67,23 @@ https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/App
 如果你习惯直接编辑 `.conf`，也可以在 `[Plugin]` 段给这条插件的导入行末尾加 `policy=` 参数，效果等同于提前指派好：
 
 ```
-https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/AppleIntelligence.plugin, policy=你的节点组名, tag=Apple Intelligence 分流, enabled=true
+https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleIntelligence.plugin, policy=你的节点组名, tag=Apple Intelligence 分流, enabled=true
 ```
 
 把 `你的节点组名` 换成你 Loon「策略」页里真实存在的组名。对普通用户来说，这比直接点通知更麻烦，按需使用即可。
 
 </details>
 
-## 关于「插件详情页内容很少」（重要）
+## 关于「插件详情页空白 / 内容很少」（重要）
 
-**这是纯分流规则插件的正常现象，不是故障。**
+先分清两种「空白」：
 
-Loon 的插件详情页只渲染「元信息 + 脚本(`[Script]`) + 复写 + 可配置参数(`[Argument]`)」。别的插件详情页内容丰富，是因为它们带脚本和大量参数；本插件**只有 `[Rule]` 分流规则 + 一个 `[Argument]` 开关（禁用 QUIC）**——分流规则不会在详情页里逐条列出，它们汇入 Loon 全局的「规则」总计数里。
+- **完全空白，连说明文字都没有** → 多半是**插件内容没下载下来**，最常见原因是用了 `raw.githubusercontent.com` 而你的网络（如国内大陆）连不上。**换成上面的 jsDelivr 链接重新添加即可。**
+- **只显示说明文字、规则没有逐条列出** → 这是**纯分流规则插件的正常现象，不是故障**。
 
-所以详情页只显示说明文字 + 一个开关 = 正常。**判断生效请看下方「验证是否生效」，不要看详情页规则是否逐条罗列。**
+为什么「只有说明文字」是正常的：Loon 的插件详情页只渲染「元信息 + 脚本(`[Script]`) + 复写 + 可配置参数(`[Argument]`)」。别的插件内容丰富是因为带脚本和大量参数；本插件**只有 `[Rule]` 分流规则 + 一个 `[Argument]` 开关（禁用 QUIC）**——分流规则不会逐条列出，它们汇入 Loon 全局的「规则」总计数里。
+
+**判断生效请看下方「验证是否生效」，不要看详情页规则是否逐条罗列。**
 
 ## 验证是否生效
 
