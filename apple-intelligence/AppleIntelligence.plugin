@@ -1,5 +1,5 @@
 #!name=Apple Intelligence 分流
-#!desc=解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」：把以下 Apple 官方 AI / Siri 域名分流到你的节点。\n\n【分流域名】\n• apple-relay.apple.com — 苹果智能扩展\n• apple-relay.cloudflare.com — 私有云计算(PCC)\n• apple-relay.fastly-edge.com — 私有云计算(PCC)\n• cp4.cloudflare.com — 私有云计算(PCC)\n• guzzoni.apple.com — Siri / 听写\n• *.smoot.apple.com — 搜索(Siri/Spotlight/Lookup/Safari/News)\n来源：Apple 官方文档 support.apple.com/en-us/101555\n\n【用法】安装后 Loon 会弹「PROXY 未指定」提醒，点一下该通知（或进入本插件「策略」处），把策略选成你的代理节点组即可。只需一次，选完永久不再提醒；这是所有走代理插件的统一交互，作者无法替你预填。\n\n【可选开关】本插件「设置」里有一个「禁用 QUIC」开关，默认关闭。若你的节点不转发 UDP、苹果智能仍报网络错误，可打开它强制把请求回落到 TCP 走代理（注意：这会影响所有走 HTTP/3 的服务，如 YouTube 加速）。\n\n【说明】纯分流规则，无脚本 / 无 MITM；规则不会在详情页逐条列出，是否生效请看 Loon 抓包记录或首页「规则」计数。
+#!desc=解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」：把以下 Apple 官方 AI / Siri 域名分流到你的节点。\n\n【分流域名】\n• apple-relay.apple.com — 苹果智能扩展\n• apple-relay.cloudflare.com — 私有云计算(PCC)\n• apple-relay.fastly-edge.com — 私有云计算(PCC)\n• cp4.cloudflare.com — 私有云计算(PCC)\n• guzzoni.apple.com — Siri / 听写\n• *.smoot.apple.com — 搜索(Siri/Spotlight/Lookup/Safari/News)\n来源：Apple 官方文档 support.apple.com/en-us/101555\n\n【用法】安装后 Loon 会弹「PROXY 未指定」提醒，点一下该通知（或进入本插件「策略」处），把策略选成你的代理节点组即可。只需一次，选完永久不再提醒；这是所有走代理插件的统一交互，作者无法替你预填。\n\n【可选开关】本插件「设置」里有一个「禁用苹果智能的 QUIC」开关，默认关闭。若你的节点不转发 UDP、苹果智能仍报网络错误，可打开它——仅对 apple-relay 等几个苹果域名拒绝 QUIC、强制回落 TCP 走代理，不影响 YouTube 等其它 HTTP/3 服务。\n\n【说明】纯分流规则，无脚本 / 无 MITM；规则不会在详情页逐条列出，是否生效请看 Loon 抓包记录或首页「规则」计数。
 #!author=ccfco[https://github.com/ccfco]
 #!homepage=https://github.com/ccfco/loon-plugins
 #!icon=https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/icon.png
@@ -7,9 +7,17 @@
 #!date=2026-06-09
 
 [Argument]
-DisableQUIC = switch,false,tag=禁用 QUIC（UDP 443）,desc=默认关闭。苹果智能的 PCC 域名同时支持 QUIC(UDP 443)，若你的节点不转发 UDP，QUIC 请求会绕过分流、仍报「网络错误」。打开后会全局拒绝 QUIC、强制回落 TCP 走代理——注意这会影响所有走 HTTP/3 的服务（如 YouTube 加速）。建议先换支持 UDP 的节点，仍不行再开此项。
+DisableQUIC = switch,false,tag=禁用苹果智能的 QUIC,desc=默认关闭。仅对 apple-relay 等 PCC 域名拒绝 QUIC(UDP 443)、强制回落 TCP 走代理，适合「节点不转发 UDP、苹果智能报网络错误」的情况。只影响这几个苹果域名，不动 YouTube 等其它 HTTP/3。节点 UDP 正常就保持关闭（QUIC 直连更快）。
 
 [Rule]
+# ===== 可选：仅对苹果智能(PCC)域名禁用 QUIC，强制回落 TCP =====
+# 默认关闭，由「设置」里的 DisableQUIC 开关控制；只影响下面这几个苹果域名，不动其它 HTTP/3。
+# 放在最前：QUIC 命中即拒，先于下方的 PROXY 路由规则生效。
+AND,((PROTOCOL,UDP),(DEST-PORT,443),(DOMAIN,apple-relay.apple.com)),REJECT,enabled={DisableQUIC}
+AND,((PROTOCOL,UDP),(DEST-PORT,443),(DOMAIN,apple-relay.cloudflare.com)),REJECT,enabled={DisableQUIC}
+AND,((PROTOCOL,UDP),(DEST-PORT,443),(DOMAIN,apple-relay.fastly-edge.com)),REJECT,enabled={DisableQUIC}
+AND,((PROTOCOL,UDP),(DEST-PORT,443),(DOMAIN,cp4.cloudflare.com)),REJECT,enabled={DisableQUIC}
+
 # ===== Apple Intelligence / Private Cloud Compute =====
 # Apple Intelligence Extensions
 DOMAIN,apple-relay.apple.com,PROXY
@@ -25,6 +33,3 @@ DOMAIN,cp4.cloudflare.com,PROXY
 DOMAIN,guzzoni.apple.com,PROXY
 # 搜索服务（Siri / Spotlight / Lookup / Safari / News / Messages / Music）
 DOMAIN-SUFFIX,smoot.apple.com,PROXY
-
-# ===== 可选：禁用 QUIC，强制回落 TCP（默认关闭，由「设置」里的 DisableQUIC 开关控制）=====
-AND,((PROTOCOL,UDP),(DEST-PORT,443)),REJECT,enabled={DisableQUIC}

@@ -86,17 +86,18 @@ https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleInte
 
 1. **看流量（最准）**：进入「写作工具」/ 通知摘要，或让 Siri 做一次云端请求；然后在 Loon「请求 / 抓包记录」里搜 `apple-relay`，确认这些请求**命中了你的代理组**而非 DIRECT。
 2. **看功能**：苹果智能不再报网络错误、能正常返回结果。
-3. **看规则计数**：安装前后对比 Loon 首页「规则」总数，应增加 6 条（若打开了「禁用 QUIC」开关则为 7 条）。
+3. **看规则计数**：安装前后对比 Loon 首页「规则」总数，应增加 6 条（打开「禁用苹果智能的 QUIC」开关后会再多 4 条 QUIC 拦截规则）。
 
 ## 排错
 
 **仍然报网络错误？** 大概率是 **QUIC / HTTP3（UDP 443）漏走直连**——PCC 域名同时支持 UDP，如果你的节点不中继 UDP，QUIC 请求会绕过 TCP 分流。两种处理：
 
-- **首选**：确认你的代理节点支持 UDP 转发（多数 SS / Trojan / VLESS / Hysteria 节点都支持）。
-- **备选**：打开本插件自带的 **「禁用 QUIC（UDP 443）」开关**（插件「设置」里，默认关闭），它会全局拒绝 QUIC、强制回落 TCP 走代理。等价于在配置里加这条规则：
+- **首选**：确认你的代理节点支持 UDP 转发（多数 SS / Trojan / VLESS / Hysteria 节点都支持）。UDP 正常时 QUIC 直接走代理最快，无需任何额外操作。
+- **备选**：打开本插件自带的 **「禁用苹果智能的 QUIC」开关**（插件「设置」里，默认关闭）。它**只对 apple-relay 等几个 PCC 域名**拒绝 QUIC、强制回落 TCP 走代理，**不影响 YouTube 等其它 HTTP/3**。等价于给这几个域名各加一条：
   ```
-  AND,((PROTOCOL,UDP),(DEST-PORT,443)),REJECT
+  AND,((PROTOCOL,UDP),(DEST-PORT,443),(DOMAIN,apple-relay.apple.com)),REJECT
   ```
+  > 注意：开关只能让苹果的 QUIC 回落到 TCP。如果你的节点**连 TCP 都连不到** apple-relay（抓包里 TCP 也失败），那是节点 / 落地区域问题，换节点才行——插件无能为力。
   > 注意这会禁掉**所有** QUIC（可能影响 YouTube 等的 HTTP3 加速），所以默认关闭，按需开启。
 
 **选了策略还是没分流 / 点进去空白？** 确认插件详情里「策略」已手动选成你的节点组；若整个插件内容显示空白，多半是规则策略字段非法（Loon 插件规则只接受 `DIRECT` / `REJECT`类 / `PROXY` 三种），本插件统一用 `PROXY`，正常应能解析。
