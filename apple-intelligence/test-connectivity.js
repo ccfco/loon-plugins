@@ -1,60 +1,51 @@
-// 先测一个直连可达的域名（百度），确认 $httpClient 是否走代理
-// 如果百度 OK 但 apple-relay 不 OK，说明直连；
-// 如果百度也超时，说明 $httpClient 走了代理但节点有问题。
+// 参考：$environment.params 在 generic 脚本里是触发时选中的节点/策略组
+// node: $environment.params 告诉 $httpClient 走指定节点，不传则走默认
+var policy = $environment.params;
+console.log('触发策略: ' + JSON.stringify(policy));
 
-var probes = [
-  { label: '[对照] baidu.com（直连可达）', url: 'https://www.baidu.com/', direct: true },
-  { label: '[对照] google.com（需代理）',  url: 'https://www.google.com/', direct: false },
-  { label: 'apple-relay.apple.com',        url: 'https://apple-relay.apple.com/' },
-  { label: 'apple-relay.cloudflare.com',   url: 'https://apple-relay.cloudflare.com/' },
-  { label: 'guzzoni.apple.com',            url: 'https://guzzoni.apple.com/' },
+var targets = [
+  { label: 'apple-relay.apple.com',       url: 'https://apple-relay.apple.com/' },
+  { label: 'apple-relay.cloudflare.com',  url: 'https://apple-relay.cloudflare.com/' },
+  { label: 'apple-relay.fastly-edge.com', url: 'https://apple-relay.fastly-edge.com/' },
+  { label: 'cp4.cloudflare.com',          url: 'https://cp4.cloudflare.com/' },
+  { label: 'guzzoni.apple.com',           url: 'https://guzzoni.apple.com/' },
+  { label: 'api.smoot.apple.com',         url: 'https://api.smoot.apple.com/' },
 ];
 
 var rows = [];
-var pending = probes.length;
+var pending = targets.length;
 
-console.log('诊断中...');
+targets.forEach(function(t) {
+  var opts = { url: t.url, timeout: 8000 };
+  if (policy) opts.node = policy;
 
-probes.forEach(function(p) {
   var t0 = Date.now();
-  $httpClient.get({ url: p.url, timeout: 10 }, function(err, resp) {
+  $httpClient.get(opts, function(err, resp) {
     var ms = Date.now() - t0;
     var line;
     try {
       if (err) {
-        line = '❌ ' + p.label + ' (' + ms + 'ms 失败)';
+        line = '❌ ' + t.label + ' (' + ms + 'ms)';
+        console.log(line + ' err=' + JSON.stringify(err));
       } else {
-        line = '✅ ' + p.label + ' HTTP' + resp.status + ' ' + ms + 'ms';
+        line = (resp.status < 500 ? '✅' : '⚠️') + ' ' + t.label + ' HTTP' + resp.status + ' ' + ms + 'ms';
+        console.log(line);
       }
     } catch(e) {
-      line = '⚠️ ' + p.label + ' 异常';
+      line = '⚠️ ' + t.label + ' 异常: ' + e.message;
+      console.log(line);
     }
     rows.push(line);
-    console.log(line);
     pending--;
     if (pending === 0) finish();
   });
 });
 
 function finish() {
-  var baiduOk  = rows.some(function(r) { return r.indexOf('baidu') > -1 && r.indexOf('✅') === 0; });
-  var googleOk = rows.some(function(r) { return r.indexOf('google') > -1 && r.indexOf('✅') === 0; });
-
-  var diagnosis;
-  if (!baiduOk && !googleOk) {
-    diagnosis = '⚠️ $httpClient 走代理，但代理节点连不出去';
-  } else if (baiduOk && !googleOk) {
-    diagnosis = '⚠️ $httpClient 走直连（百度通 Google 不通），脚本测不了代理效果';
-  } else if (baiduOk && googleOk) {
-    diagnosis = '✅ $httpClient 走代理且代理正常';
-  } else {
-    diagnosis = '? 结果异常';
-  }
-
+  var allOk = rows.every(function(r) { return r.indexOf('❌') !== 0; });
+  var summary = allOk ? '✅ 全部可达，分流正常' : '❌ 有域名不可达，请换节点';
   console.log('---');
-  console.log('诊断：' + diagnosis);
-
-  var body = rows.join('\n') + '\n\n诊断：' + diagnosis;
-  $notification.post('Apple Intelligence 连通性', diagnosis, body);
-  $done({ title: 'Apple Intelligence 连通性', content: body });
+  console.log(summary);
+  $notification.post('Apple Intelligence 连通性', summary, rows.join('\n'));
+  $done({ title: 'Apple Intelligence 连通性', content: rows.join('\n') });
 }
