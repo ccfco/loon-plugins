@@ -49,10 +49,9 @@ function finish() {
   var allOk = rows.every(function(r) { return r.indexOf('❌') !== 0; });
   var summary = allOk
     ? '✅ 全部域名可达，分流正常'
-    : '❌ 部分域名不可达，请检查节点或策略';
+    : '❌ 部分域名不可达，请换节点';
+  var body = rows.join('\n') + '\n(HTTP 4xx = 服务器可达，属正常)';
 
-  $done({
-    title: 'Apple Intelligence 连通性',
-    content: rows.join('\n') + '\n\n' + summary + '\n（HTTP 4xx = 服务器可达，属正常）'
-  });
+  $notification.post('Apple Intelligence 连通性', summary, body);
+  $done({ title: 'Apple Intelligence 连通性', content: body });
 }
