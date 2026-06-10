@@ -6,7 +6,7 @@
 
 | 插件 | 说明 | 类型 | 安装链接 |
 |------|------|------|---------|
-| [Apple Intelligence 分流](apple-intelligence/) | 把苹果智能 / PCC / Siri 域名分流到代理，解决「网络错误」；内置连通性测试面板 | `[Rule]` + `[Script]` + `[Panel]`，无 MITM | `https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleIntelligence.plugin` |
+| [Apple Intelligence 分流](apple-intelligence/) | 把苹果智能 / PCC / Siri 域名分流到代理，解决「网络错误」 | `[Rule]`，无 MITM | `https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleIntelligence.plugin` |
 
 ## 安装方式
 
