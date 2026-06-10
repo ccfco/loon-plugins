@@ -1,7 +1,10 @@
-// 参考：$environment.params 在 generic 脚本里是触发时选中的节点/策略组
-// node: $environment.params 告诉 $httpClient 走指定节点，不传则走默认
-var policy = $environment.params;
-console.log('触发策略: ' + JSON.stringify(policy));
+/*
+ * Apple Intelligence 连通性测试
+ * 检查节点是否能访问 Apple Intelligence / Private Cloud Compute 域名
+ * 参考：https://raw.githubusercontent.com/KOP-XIAO/QuantumultX/master/Scripts/streaming-ui-check.js
+ */
+
+var nodeName = $environment.params.node;
 
 var targets = [
   { label: 'apple-relay.apple.com',       url: 'https://apple-relay.apple.com/' },
@@ -12,40 +15,38 @@ var targets = [
   { label: 'api.smoot.apple.com',         url: 'https://api.smoot.apple.com/' },
 ];
 
-var rows = [];
-var pending = targets.length;
+var results = {};
 
-targets.forEach(function(t) {
-  var opts = { url: t.url, timeout: 8000 };
-  if (policy) opts.node = policy;
-
-  var t0 = Date.now();
-  $httpClient.get(opts, function(err, resp) {
-    var ms = Date.now() - t0;
-    var line;
-    try {
+function test(target) {
+  return new Promise(function(resolve) {
+    $httpClient.get({
+      url: target.url,
+      node: nodeName,
+      timeout: 8000,
+    }, function(err, resp) {
       if (err) {
-        line = '❌ ' + t.label + ' (' + ms + 'ms)';
-        console.log(line + ' err=' + JSON.stringify(err));
+        results[target.label] = '<b>' + target.label + ':</b> 不可达 🚫';
       } else {
-        line = (resp.status < 500 ? '✅' : '⚠️') + ' ' + t.label + ' HTTP' + resp.status + ' ' + ms + 'ms';
-        console.log(line);
+        var ok = resp.status < 500;
+        results[target.label] = '<b>' + target.label + ':</b> ' + (ok ? '可达 ✅' : '异常 ⚠️') + ' HTTP ' + resp.status;
       }
-    } catch(e) {
-      line = '⚠️ ' + t.label + ' 异常: ' + e.message;
-      console.log(line);
-    }
-    rows.push(line);
-    pending--;
-    if (pending === 0) finish();
+      resolve();
+    });
   });
-});
-
-function finish() {
-  var allOk = rows.every(function(r) { return r.indexOf('❌') !== 0; });
-  var summary = allOk ? '✅ 全部可达，分流正常' : '❌ 有域名不可达，请换节点';
-  console.log('---');
-  console.log(summary);
-  $notification.post('Apple Intelligence 连通性', summary, rows.join('\n'));
-  $done({ title: 'Apple Intelligence 连通性', content: rows.join('\n') });
 }
+
+Promise.all(targets.map(test)).then(function() {
+  var lines = targets.map(function(t) { return results[t.label]; });
+  var allOk = lines.every(function(l) { return l.indexOf('🚫') === -1; });
+  var summary = allOk ? '苹果智能应该可用 ✅' : '部分域名不可达，苹果智能可能受影响 ⚠️';
+
+  var content = '------------------------------------</br>'
+    + lines.join('</br></br>')
+    + '</br>------------------------------------</br>'
+    + '<font color=#CD5C5C><b>节点</b> ➟ ' + nodeName + '</font></br>'
+    + '<b>结论:</b> ' + summary;
+
+  content = '<p style="text-align:center;font-family:-apple-system;font-size:large">' + content + '</p>';
+
+  $done({ title: '🍎 Apple Intelligence 连通性', htmlMessage: content });
+});
