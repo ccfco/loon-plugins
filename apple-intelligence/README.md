@@ -18,14 +18,14 @@
 
 来自 Apple 官方文档 [Use Apple products on enterprise networks](https://support.apple.com/en-us/101555) 的 **Apple Intelligence, Siri, and Search** 章节：
 
-| 域名 | 端口/协议 | 用途 |
-|------|-----------|------|
-| `apple-relay.apple.com` | 443 TCP/UDP | Apple Intelligence Extensions |
-| `apple-relay.cloudflare.com` | 443 TCP/UDP | Private Cloud Compute |
-| `apple-relay.fastly-edge.com` | 443 TCP/UDP | Private Cloud Compute |
-| `cp4.cloudflare.com` | 443 TCP/UDP | Private Cloud Compute |
-| `guzzoni.apple.com` | 443 TCP | Siri / 听写请求 |
-| `*.smoot.apple.com` | 443 TCP | 搜索（Siri / Spotlight / Lookup / Safari / News 等）|
+| 域名 | 用途 |
+|------|------|
+| `apple-relay.apple.com` | Apple Intelligence Extensions |
+| `apple-relay.cloudflare.com` | Private Cloud Compute |
+| `apple-relay.fastly-edge.com` | Private Cloud Compute |
+| `cp4.cloudflare.com` | Private Cloud Compute |
+| `guzzoni.apple.com` | Siri / 听写请求 |
+| `*.smoot.apple.com` | 搜索（Siri / Spotlight / Lookup / Safari / News 等）|
 
 ## 安装
 
@@ -76,7 +76,7 @@ https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleInte
 - **完全空白，连说明文字都没有** → 多半是**插件内容没下载下来**，最常见原因是用了 `raw.githubusercontent.com` 而你的网络（如国内大陆）连不上。**换成上面的 jsDelivr 链接重新添加即可。**
 - **只显示说明文字、规则没有逐条列出** → 正常现象，不是故障。
 
-分流规则不会在详情页逐条列出，它们汇入 Loon 全局的「规则」总计数里。详情页里会显示「连通性测试」脚本和「禁用 QUIC」开关，这些才是详情页会渲染的内容。
+分流规则不会在详情页逐条列出，它们汇入 Loon 全局的「规则」总计数里。详情页里会显示「连通性测试」脚本，这才是详情页会渲染的内容。
 
 **判断生效请看下方「验证是否生效」，不要看详情页规则是否逐条罗列。**
 
@@ -95,7 +95,7 @@ https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleInte
 |------|------|
 | `✅ HTTP 4xx` | **代理正常**（苹果服务器要求认证，能回复就说明链路通） |
 | `✅ HTTP 2xx` | 完全可达 |
-| `❌ 连接失败/超时` | 代理链路断了，检查节点或开启「禁用 QUIC」开关 |
+| `❌ 连接失败/超时` | 代理链路断了，需要换节点 |
 
 ### 方法二：看 Loon 抓包记录
 
@@ -107,19 +107,15 @@ https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleInte
 
 ## 排错
 
-**仍然报网络错误？** 大概率是 **QUIC / HTTP3（UDP 443）漏走直连**——PCC 域名同时支持 UDP，如果你的节点不中继 UDP，QUIC 请求会绕过 TCP 分流。两种处理：
+**装了插件、选了节点、但连通性测试显示 ❌？** 说明你的节点本身连不到苹果的 PCC 服务器。常见原因：
 
-- **首选**：确认你的代理节点支持 UDP 转发（多数 SS / Trojan / VLESS / Hysteria 节点都支持）。UDP 正常时 QUIC 直接走代理最快，无需任何额外操作。
-- **备选**：打开本插件自带的 **「禁用苹果智能的 QUIC」开关**（插件「设置」里，默认关闭）。它**只对 apple-relay 等几个 PCC 域名**拒绝 QUIC、强制回落 TCP 走代理，**不影响 YouTube 等其它 HTTP/3**。等价于给这几个域名各加一条：
-  ```
-  AND,((PROTOCOL,UDP),(DEST-PORT,443),(DOMAIN,apple-relay.apple.com)),REJECT
-  ```
-  > 注意：开关只能让苹果的 QUIC 回落到 TCP。如果你的节点**连 TCP 都连不到** apple-relay（抓包里 TCP 也失败），那是节点 / 落地区域问题，换节点才行——插件无能为力。
-  > 注意这会禁掉**所有** QUIC（可能影响 YouTube 等的 HTTP3 加速），所以默认关闭，按需开启。
+- 节点落地 IP 被苹果封禁（部分机场 IP 段被苹果屏蔽）
+- 节点出口不在苹果支持的地区（需要美国或其他支持苹果智能的地区）
+- 节点本身故障，换一个节点试试
 
-**选了策略还是没分流 / 点进去空白？** 确认插件详情里「策略」已手动选成你的节点组；若整个插件内容显示空白，多半是规则策略字段非法（Loon 插件规则只接受 `DIRECT` / `REJECT`类 / `PROXY` 三种），本插件统一用 `PROXY`，正常应能解析。
+**选了策略还是没分流？** 确认插件详情里「策略」已手动选成你的节点组；若整个插件内容显示空白，多半是链接问题，换成 jsDelivr 链接重新添加。
 
 ## 维护说明
 
 - 域名清单可能随 iOS 版本变化。若苹果更新了 [101555](https://support.apple.com/en-us/101555)，对照「Apple Intelligence, Siri, and Search」章节增删 `[Rule]` 即可。
-- 本插件不含脚本/MITM，无需随 iOS 升级维护证书或脚本兼容性。
+- 本插件无 MITM，无需随 iOS 升级维护证书或脚本兼容性。
