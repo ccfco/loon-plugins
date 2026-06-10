@@ -1,52 +1,63 @@
 /*
- * Apple Intelligence 连通性测试
+ * 苹果AI连通性测试
  * 检查节点是否能访问 Apple Intelligence / Private Cloud Compute 域名
- * 参考：https://raw.githubusercontent.com/KOP-XIAO/QuantumultX/master/Scripts/streaming-ui-check.js
+ * apple-relay.apple.com 和 cp4.cloudflare.com 是 OHTTP 中继，
+ * 需要用 POST + Content-Type: message/ohttp-req 才能得到服务器响应，
+ * 普通 GET 请求会被服务器静默丢弃（超时）。
  */
 
-var nodeName = $environment.params.node;
+var nodeName = ($environment.params && $environment.params.node) || null;
 
-var targets = [
-  { label: 'apple-relay.apple.com',       url: 'https://apple-relay.apple.com/' },
-  { label: 'apple-relay.cloudflare.com',  url: 'https://apple-relay.cloudflare.com/' },
-  { label: 'apple-relay.fastly-edge.com', url: 'https://apple-relay.fastly-edge.com/' },
-  { label: 'cp4.cloudflare.com',          url: 'https://cp4.cloudflare.com/' },
-  { label: 'guzzoni.apple.com',           url: 'https://guzzoni.apple.com/' },
-  { label: 'api.smoot.apple.com',         url: 'https://api.smoot.apple.com/' },
+var domains = [
+  { label: 'apple-relay.apple.com',       url: 'https://apple-relay.apple.com/',       ohttp: true  },
+  { label: 'apple-relay.cloudflare.com',  url: 'https://apple-relay.cloudflare.com/',  ohttp: false },
+  { label: 'apple-relay.fastly-edge.com', url: 'https://apple-relay.fastly-edge.com/', ohttp: false },
+  { label: 'cp4.cloudflare.com',          url: 'https://cp4.cloudflare.com/',          ohttp: true  },
+  { label: 'guzzoni.apple.com',           url: 'https://guzzoni.apple.com/',           ohttp: false },
+  { label: 'api.smoot.apple.com',         url: 'https://api.smoot.apple.com/',         ohttp: false },
 ];
 
-var results = {};
-
-function test(target) {
+function probe(url, node, useOhttp) {
   return new Promise(function(resolve) {
-    $httpClient.get({
-      url: target.url,
-      node: nodeName,
-      timeout: 8000,
-    }, function(err, resp) {
-      if (err) {
-        results[target.label] = '<b>' + target.label + ':</b> 不可达 🚫';
-      } else {
-        var ok = resp.status < 500;
-        results[target.label] = '<b>' + target.label + ':</b> ' + (ok ? '可达 ✅' : '异常 ⚠️') + ' HTTP ' + resp.status;
-      }
-      resolve();
-    });
+    var opts = { url: url, timeout: 8000 };
+    if (node !== null) opts.node = node;
+    if (useOhttp) {
+      opts.headers = { 'Content-Type': 'message/ohttp-req' };
+      opts.body = '';
+    }
+    var cb = function(err, resp) {
+      if (err) resolve({ ok: false, status: null });
+      else      resolve({ ok: resp.status < 500, status: resp.status });
+    };
+    if (useOhttp) $httpClient.post(opts, cb);
+    else          $httpClient.get(opts, cb);
   });
 }
 
-Promise.all(targets.map(test)).then(function() {
-  var lines = targets.map(function(t) { return results[t.label]; });
-  var allOk = lines.every(function(l) { return l.indexOf('🚫') === -1; });
-  var summary = allOk ? '苹果智能应该可用 ✅' : '部分域名不可达，苹果智能可能受影响 ⚠️';
+function row(label, r) {
+  return '<b>' + label + ':</b> ' + (r.ok ? '✅' : '🚫') + (r.status ? ' HTTP ' + r.status : ' 超时');
+}
 
-  var content = '------------------------------------</br>'
-    + lines.join('</br></br>')
-    + '</br>------------------------------------</br>'
-    + '<font color=#CD5C5C><b>节点</b> ➟ ' + nodeName + '</font></br>'
+var proxyTests  = domains.map(function(d) { return probe(d.url, nodeName,  d.ohttp); });
+var directTests = domains.slice(0, 2).map(function(d) { return probe(d.url, 'DIRECT', d.ohttp); });
+
+Promise.all(proxyTests.concat(directTests)).then(function(all) {
+  var pRows = all.slice(0, domains.length);
+  var dRows = all.slice(domains.length);
+
+  var allOk = pRows.every(function(r) { return r.ok; });
+  var summary = allOk ? '全部可达，苹果智能应该正常 ✅' : '部分域名不可达，苹果智能可能受影响 ⚠️';
+
+  var content = '<b>── 通过节点 ──</b></br>'
+    + pRows.map(function(r, i) { return row(domains[i].label, r); }).join('</br>')
+    + '</br><b>── 直连对比（前两条）──</b></br>'
+    + dRows.map(function(r, i) { return row(domains[i].label + ' 直连', r); }).join('</br>')
+    + '</br>────────────────</br>'
+    + '<font color=#CD5C5C><b>节点</b> ➟ ' + (nodeName || '（未从节点菜单触发）') + '</font></br>'
     + '<b>结论:</b> ' + summary;
 
   content = '<p style="text-align:center;font-family:-apple-system;font-size:large">' + content + '</p>';
-
-  $done({ title: '🍎 Apple Intelligence 连通性', htmlMessage: content });
+  $done({ title: '🍎 苹果AI连通性', htmlMessage: content });
+}).catch(function(e) {
+  $done({ title: '🍎 苹果AI连通性', htmlMessage: '<p style="text-align:center">测试出错: ' + (e && e.message || String(e)) + '</p>' });
 });

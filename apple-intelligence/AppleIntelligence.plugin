@@ -1,5 +1,5 @@
 #!name=Apple Intelligence 分流
-#!desc=解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」：把以下 Apple 官方 AI / Siri 域名分流到你的节点。\n\n【分流域名】\n• apple-relay.apple.com — 苹果智能扩展\n• apple-relay.cloudflare.com — 私有云计算(PCC)\n• apple-relay.fastly-edge.com — 私有云计算(PCC)\n• cp4.cloudflare.com — 私有云计算(PCC)\n• guzzoni.apple.com — Siri / 听写\n• *.smoot.apple.com — 搜索(Siri/Spotlight/Lookup/Safari/News)\n来源：Apple 官方文档 support.apple.com/en-us/101555\n\n【用法】安装后 Loon 会弹「PROXY 未指定」提醒，点一下该通知（或进入本插件「策略」处），把策略选成你的代理节点组即可。只需一次，选完永久不再提醒；这是所有走代理插件的统一交互，作者无法替你预填。\n\n【连通性测试】插件内置连通性测试脚本，可在 Loon 面板（Panel）页查看各域名状态，也可在本插件「脚本」处手动触发。✅ 表示代理链路通（HTTP 4xx 是苹果服务器要求认证，属正常现象）；❌ 表示节点连不上，需要换节点。\n\n【说明】无 MITM，不改写任何请求。
+#!desc=解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」：把以下 Apple 官方 AI / Siri 域名分流到你的节点。\n\n【分流域名】\n• apple-relay.apple.com — 苹果智能扩展\n• apple-relay.cloudflare.com — 私有云计算(PCC)\n• apple-relay.fastly-edge.com — 私有云计算(PCC)\n• cp4.cloudflare.com — 私有云计算(PCC)\n• guzzoni.apple.com — Siri / 听写\n• *.smoot.apple.com — 搜索(Siri/Spotlight/Lookup/Safari/News)\n来源：Apple 官方文档 support.apple.com/en-us/101555\n\n【用法】安装后 Loon 会弹「PROXY 未指定」提醒，点一下该通知（或进入本插件「策略」处），把策略选成你的代理节点组即可。只需一次，选完永久不再提醒；这是所有走代理插件的统一交互，作者无法替你预填。\n\n【连通性测试】插件内置连通性测试脚本，可在本插件「脚本」处手动触发。✅ 表示代理链路通（HTTP 4xx 是苹果服务器要求认证，属正常现象）；❌ 表示节点连不上，需要换节点。\n\n【说明】无 MITM，不改写任何请求。
 #!author=ccfco[https://github.com/ccfco]
 #!homepage=https://github.com/ccfco/loon-plugins
 #!icon=https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/icon.png
@@ -18,7 +18,4 @@ DOMAIN,guzzoni.apple.com,PROXY
 DOMAIN-SUFFIX,smoot.apple.com,PROXY
 
 [Script]
-generic script-path=https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/test-connectivity.js,tag=连通性测试,timeout=15
-
-[Panel]
-Apple Intelligence 连通性=type=script,script-path=https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/test-connectivity.js,update-interval=0
+generic script-path=https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/test-connectivity.js,tag=苹果AI连通性测试,timeout=20
