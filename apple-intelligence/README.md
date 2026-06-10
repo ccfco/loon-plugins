@@ -82,11 +82,35 @@ https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleInte
 
 ## 验证是否生效
 
-任选其一：
+### 方法一：安装连通性测试插件（最直观）
 
-1. **看流量（最准）**：进入「写作工具」/ 通知摘要，或让 Siri 做一次云端请求；然后在 Loon「请求 / 抓包记录」里搜 `apple-relay`，确认这些请求**命中了你的代理组**而非 DIRECT。
-2. **看功能**：苹果智能不再报网络错误、能正常返回结果。
-3. **看规则计数**：安装前后对比 Loon 首页「规则」总数，应增加 6 条（打开「禁用苹果智能的 QUIC」开关后会再多 4 条 QUIC 拦截规则）。
+安装配套的 **[Apple Intelligence 连通性测试](ConnectivityTest.plugin)** 插件：
+
+```
+https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/ConnectivityTest.plugin
+```
+
+安装后进入 **Loon → 面板（Panel）页**，找到「Apple Intelligence 连通性」面板，点右上角刷新按钮即可测试。面板显示说明：
+
+| 结果 | 含义 |
+|------|------|
+| `✅ HTTP 2xx` | 域名完全可达 |
+| `✅ HTTP 4xx` | **代理正常**（服务器返回认证错误，属预期行为） |
+| `❌ 连接超时/失败` | 代理链路断了，检查节点 |
+
+> 测完可以把这个测试插件卸载，它只用于排障。
+
+### 方法二：看 Loon 抓包记录
+
+进入「写作工具」/ 通知摘要，或让 Siri 做一次云端请求；然后在 Loon「请求 / 抓包记录」里搜 `apple-relay`，确认这些请求**命中了你的代理组**而非 DIRECT。
+
+### 方法三：看功能
+
+苹果智能不再报网络错误、能正常返回结果。
+
+### 方法四：看规则计数
+
+安装前后对比 Loon 首页「规则」总数，应增加 6 条（打开「禁用苹果智能的 QUIC」开关后会再多 4 条 QUIC 拦截规则）。
 
 ## 排错
 
