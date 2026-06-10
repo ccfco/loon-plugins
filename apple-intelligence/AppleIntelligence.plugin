@@ -1,5 +1,5 @@
 #!name=Apple Intelligence 分流
-#!desc=解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」：把以下 Apple 官方 AI / Siri 域名分流到你的节点。\n\n【分流域名】\n• apple-relay.apple.com — 苹果智能扩展\n• apple-relay.cloudflare.com — 私有云计算(PCC)\n• apple-relay.fastly-edge.com — 私有云计算(PCC)\n• cp4.cloudflare.com — 私有云计算(PCC)\n• guzzoni.apple.com — Siri / 听写\n• *.smoot.apple.com — 搜索(Siri/Spotlight/Lookup/Safari/News)\n来源：Apple 官方文档 support.apple.com/en-us/101555\n\n【用法】安装后 Loon 会弹「PROXY 未指定」提醒，点一下该通知（或进入本插件「策略」处），把策略选成你的代理节点组即可。只需一次，选完永久不再提醒；这是所有走代理插件的统一交互，作者无法替你预填。\n\n【可选开关】本插件「设置」里有一个「禁用苹果智能的 QUIC」开关，默认关闭。若你的节点不转发 UDP、苹果智能仍报网络错误，可打开它——仅对 apple-relay 等几个苹果域名拒绝 QUIC、强制回落 TCP 走代理，不影响 YouTube 等其它 HTTP/3 服务。\n\n【说明】纯分流规则，无脚本 / 无 MITM；规则不会在详情页逐条列出，是否生效请看 Loon 抓包记录或首页「规则」计数。
+#!desc=解决已启用「苹果智能」的设备（美版等）在受限网络下报「网络错误」：把以下 Apple 官方 AI / Siri 域名分流到你的节点。\n\n【分流域名】\n• apple-relay.apple.com — 苹果智能扩展\n• apple-relay.cloudflare.com — 私有云计算(PCC)\n• apple-relay.fastly-edge.com — 私有云计算(PCC)\n• cp4.cloudflare.com — 私有云计算(PCC)\n• guzzoni.apple.com — Siri / 听写\n• *.smoot.apple.com — 搜索(Siri/Spotlight/Lookup/Safari/News)\n来源：Apple 官方文档 support.apple.com/en-us/101555\n\n【用法】安装后 Loon 会弹「PROXY 未指定」提醒，点一下该通知（或进入本插件「策略」处），把策略选成你的代理节点组即可。只需一次，选完永久不再提醒；这是所有走代理插件的统一交互，作者无法替你预填。\n\n【可选开关】本插件「设置」里有一个「禁用苹果智能的 QUIC」开关，默认关闭。若你的节点不转发 UDP、苹果智能仍报网络错误，可打开它——仅对 apple-relay 等几个苹果域名拒绝 QUIC、强制回落 TCP 走代理，不影响 YouTube 等其它 HTTP/3 服务。\n\n【连通性测试】插件内置连通性测试脚本，可在 Loon 面板（Panel）页查看各域名状态，也可在本插件「脚本」处手动触发。✅ 表示代理链路通（HTTP 4xx 是苹果服务器要求认证，属正常现象）；❌ 表示节点连不上，需要检查节点或开启「禁用 QUIC」开关。\n\n【说明】无 MITM，不改写任何请求。
 #!author=ccfco[https://github.com/ccfco]
 #!homepage=https://github.com/ccfco/loon-plugins
 #!icon=https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/icon.png
@@ -33,3 +33,9 @@ DOMAIN,cp4.cloudflare.com,PROXY
 DOMAIN,guzzoni.apple.com,PROXY
 # 搜索服务（Siri / Spotlight / Lookup / Safari / News / Messages / Music）
 DOMAIN-SUFFIX,smoot.apple.com,PROXY
+
+[Script]
+generic script-path=https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/connectivity-test.js,tag=连通性测试,timeout=15
+
+[Panel]
+Apple Intelligence 连通性=type=script,script-path=https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/connectivity-test.js,update-interval=0
