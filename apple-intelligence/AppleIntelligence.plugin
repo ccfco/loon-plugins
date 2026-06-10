@@ -18,7 +18,7 @@ DOMAIN,guzzoni.apple.com,PROXY
 DOMAIN-SUFFIX,smoot.apple.com,PROXY
 
 [Script]
-generic script-path=https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/test-connectivity.js,tag=连通性测试,timeout=15
+generic script-path=https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/test-connectivity.js,tag=连通性测试,timeout=15
 
 [Panel]
-Apple Intelligence 连通性=type=script,script-path=https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/test-connectivity.js,update-interval=0
+Apple Intelligence 连通性=type=script,script-path=https://raw.githubusercontent.com/ccfco/loon-plugins/main/apple-intelligence/test-connectivity.js,update-interval=0
