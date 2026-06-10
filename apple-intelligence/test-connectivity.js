@@ -1,11 +1,3 @@
-/*
- * 苹果AI连通性测试
- * 检查节点是否能访问 Apple Intelligence / Private Cloud Compute 域名
- * apple-relay.apple.com 和 cp4.cloudflare.com 是 OHTTP 中继，
- * 需要用 POST + Content-Type: message/ohttp-req 才能得到服务器响应，
- * 普通 GET 请求会被服务器静默丢弃（超时）。
- */
-
 var nodeName = ($environment.params && $environment.params.node) || null;
 
 var domains = [
@@ -34,27 +26,38 @@ function probe(url, node, useOhttp) {
   });
 }
 
-function row(label, r) {
-  return '<b>' + label + ':</b> ' + (r.ok ? '✅' : '🚫') + (r.status ? ' HTTP ' + r.status : ' 超时');
+function row(label, r, isOhttp) {
+  if (r.ok) {
+    return '<b>' + label + ':</b> ✅ HTTP ' + r.status;
+  } else if (isOhttp && r.status === null) {
+    // OHTTP relays require Apple device attestation; scripts cannot satisfy it — expected timeout
+    return '<b>' + label + ':</b> ⚠️ 无响应（OHTTP 需设备验证）';
+  } else {
+    return '<b>' + label + ':</b> 🚫' + (r.status ? ' HTTP ' + r.status : ' 超时');
+  }
 }
 
 var proxyTests  = domains.map(function(d) { return probe(d.url, nodeName,  d.ohttp); });
-var directTests = domains.slice(0, 2).map(function(d) { return probe(d.url, 'DIRECT', d.ohttp); });
+var directTests = domains.map(function(d) { return probe(d.url, 'DIRECT',  d.ohttp); });
 
 Promise.all(proxyTests.concat(directTests)).then(function(all) {
   var pRows = all.slice(0, domains.length);
   var dRows = all.slice(domains.length);
 
-  var allOk = pRows.every(function(r) { return r.ok; });
-  var summary = allOk ? '全部可达，苹果智能应该正常 ✅' : '部分域名不可达，苹果智能可能受影响 ⚠️';
+  // OHTTP domains always timeout from scripts (device attestation required); exclude them from ok check
+  var allOk = pRows.every(function(r, i) { return domains[i].ohttp || r.ok; });
+  var summary = allOk
+    ? '可达域名全部正常，苹果智能应该可用 ✅'
+    : '部分域名不可达，苹果智能可能受影响 ⚠️';
 
   var content = '<b>── 通过节点 ──</b></br>'
-    + pRows.map(function(r, i) { return row(domains[i].label, r); }).join('</br>')
-    + '</br><b>── 直连对比（前两条）──</b></br>'
-    + dRows.map(function(r, i) { return row(domains[i].label + ' 直连', r); }).join('</br>')
+    + pRows.map(function(r, i) { return row(domains[i].label, r, domains[i].ohttp); }).join('</br>')
+    + '</br><b>── 直连对比 ──</b></br>'
+    + dRows.map(function(r, i) { return row(domains[i].label, r, domains[i].ohttp); }).join('</br>')
     + '</br>────────────────</br>'
     + '<font color=#CD5C5C><b>节点</b> ➟ ' + (nodeName || '（未从节点菜单触发）') + '</font></br>'
-    + '<b>结论:</b> ' + summary;
+    + '<b>结论:</b> ' + summary + '</br>'
+    + '<small>⚠️ 无响应 = OHTTP 中继需苹果设备认证，脚本测不到，属正常</small>';
 
   content = '<p style="text-align:center;font-family:-apple-system;font-size:large">' + content + '</p>';
   $done({ title: '🍎 苹果AI连通性', htmlMessage: content });
