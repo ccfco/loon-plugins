@@ -27,7 +27,13 @@ https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/AppleInte
 
 > 国内大陆用上面的 jsDelivr 链接。`raw.githubusercontent.com` 在大陆经常连不上，会导致详情页空白。
 
-安装后点「PROXY 未指定」通知，选好你的节点组即可，只需一次。
+安装后会提示分别为三组配置策略：
+
+| 组 | 域名 | 建议 |
+|----|------|------|
+| PCC 苹果中继 | apple-relay.apple.com / cp4.cloudflare.com | 代理（国内直连超时） |
+| PCC CDN 中继 | apple-relay.cloudflare.com / fastly-edge.com | 代理或 DIRECT（国内可直连） |
+| Siri / 搜索 | guzzoni.apple.com / smoot.apple.com | 代理或 DIRECT（看网络） |
 
 ## 验证是否生效
 

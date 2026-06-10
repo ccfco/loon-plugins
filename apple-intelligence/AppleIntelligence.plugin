@@ -1,18 +1,20 @@
 #!name=Apple Intelligence 分流
-#!desc=把苹果智能 / Siri / 搜索相关域名分流到代理节点，解决在受限网络下报「网络错误」的问题。无 MITM，不改写任何请求。\n\n安装后点「PROXY 未指定」通知，选好你的节点组即可。
+#!desc=把苹果智能 / Siri / 搜索相关域名分流到代理节点，解决在受限网络下报「网络错误」的问题。三组策略可分别配置，国内能直连的组可设为 DIRECT。无 MITM，不改写任何请求。
 #!author=ccfco[https://github.com/ccfco]
 #!homepage=https://github.com/ccfco/loon-plugins
 #!icon=https://cdn.jsdelivr.net/gh/ccfco/loon-plugins@main/apple-intelligence/icon.png
 #!tag=Apple, Apple Intelligence, 分流
-#!date=2026-06-10
+#!date=2026-06-11
+
+[Argument]
+pcc_apple=PROXY,node,PCC 苹果中继 (apple-relay.apple.com / cp4.cloudflare.com)
+pcc_cdn=PROXY,node,PCC CDN 中继 (apple-relay.cloudflare.com / fastly-edge.com)
+siri=PROXY,node,Siri / 搜索 (guzzoni.apple.com / smoot.apple.com)
 
 [Rule]
-# ===== Apple Intelligence / Private Cloud Compute =====
-DOMAIN,apple-relay.apple.com,PROXY
-DOMAIN,apple-relay.cloudflare.com,PROXY
-DOMAIN,apple-relay.fastly-edge.com,PROXY
-DOMAIN,cp4.cloudflare.com,PROXY
-
-# ===== Siri / 听写 / 搜索 =====
-DOMAIN,guzzoni.apple.com,PROXY
-DOMAIN-SUFFIX,smoot.apple.com,PROXY
+DOMAIN,apple-relay.apple.com,$pcc_apple
+DOMAIN,cp4.cloudflare.com,$pcc_apple
+DOMAIN,apple-relay.cloudflare.com,$pcc_cdn
+DOMAIN,apple-relay.fastly-edge.com,$pcc_cdn
+DOMAIN,guzzoni.apple.com,$siri
+DOMAIN-SUFFIX,smoot.apple.com,$siri
